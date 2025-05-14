@@ -1,0 +1,11 @@
+app_name = "solana_hackathon"
+debug = true
+[logger]
+log_to_file = false
+log_filter = "solana_hackathon=debug"
+log_prefix = "solana_hackathon"
+log_directory = "logs"
+
+[db]
+database_url = "postgres://postgres:password@127.0.0.1:5432/solana_hackathon"  # Use 'db' hostname for Docker
+max_connections = 32

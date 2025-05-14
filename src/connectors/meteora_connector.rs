@@ -1,6 +1,6 @@
 use crate::entities::meteora_pool::MeteoraPool;
 use reqwest::Client;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 
 #[derive(Debug, Deserialize)]

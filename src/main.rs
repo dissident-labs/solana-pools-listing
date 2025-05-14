@@ -2,22 +2,21 @@ pub mod connectors;
 pub mod database;
 mod entities;
 mod repositories;
+pub mod server;
 pub mod utils;
 
 use crate::database::{DBSettings, DatabaseTrait};
 use crate::entities::financial_product::FinancialProduct;
-use crate::entities::meteora_pool::MeteoraPool;
-use crate::entities::pool::Pool;
 
 use crate::connectors::meteora_connector::fetch_meteora_pools;
 use crate::connectors::orderly_connector::fetch_orderly_vaults;
 use crate::repositories::meteora_pool_repository::add_meteora_pool;
-use crate::repositories::pool_repository::add_pool;
 use crate::repositories::vault_repository::add_vault;
+use crate::server::ServerSettings;
 use crate::utils::logger::LoggerSettings;
+
 use clap::{command, Parser, Subcommand};
 use dotenvy::dotenv;
-use entities::meteora_pool;
 use serde::Deserialize;
 use tracing::info;
 
@@ -26,8 +25,8 @@ pub struct AppSettings {
     pub app_name: String,
     pub debug: bool,
     pub logger: LoggerSettings,
-    // Add these fields
     pub db: DBSettings,
+    pub server_settings: ServerSettings,
 }
 
 const PATH: &str = ".";
@@ -46,6 +45,11 @@ enum Commands {
     Sync,
     /// List all financial products sorted by APR
     List,
+    /// Start the API server
+    Server {
+        #[arg(short, long, default_value_t = 3000)]
+        port: u16,
+    },
 }
 
 async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
@@ -91,6 +95,9 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
+        }
+        Commands::Server {} => {
+            crate::server::run_server(db_pool, configuration.server_settings.port).await?;
         }
     }
 

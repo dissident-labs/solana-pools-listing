@@ -27,3 +27,9 @@ async-trait = "0.1.65"
 clap = { version = "4.0", features = ["derive"] }
 axum = "0.8.4"
 axum-extra = {version = "0.10.0", features=["typed-header"]}
+tower = { version = "0.5.2", features = ["full"] }
+tower-http = { version = "0.6.2", features = ["cors", "trace"] }
+thiserror = "2.0.12"
+http = "1.2.0"
+validator = { version = "0.20.0", features = ["derive"] }
+

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This part of the project that monitors the yield on crypto products from the Meteora and Orderly protocols.
+This part of the project monitors the yield on crypto products from the Orderly and Meteora protocols.
 
 A Rust-based service that aggregates crypto yield products from multiple protocols (Meteora pools and Orderly vaults) with CLI and API access. Developed for [La Familia Barcelona Hackathon](https://linktr.ee/lafamilia.so) Demo Day, this project showcases real-time data aggregation capabilities for decentralized finance protocols.
 

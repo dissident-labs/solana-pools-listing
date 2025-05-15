@@ -2,22 +2,24 @@ pub mod connectors;
 pub mod database;
 mod entities;
 mod repositories;
+pub mod server;
 pub mod utils;
 
 use crate::database::{DBSettings, DatabaseTrait};
 use crate::entities::financial_product::FinancialProduct;
-use crate::entities::meteora_pool::MeteoraPool;
-use crate::entities::pool::Pool;
 
 use crate::connectors::meteora_connector::fetch_meteora_pools;
 use crate::connectors::orderly_connector::fetch_orderly_vaults;
 use crate::repositories::meteora_pool_repository::add_meteora_pool;
-use crate::repositories::pool_repository::add_pool;
 use crate::repositories::vault_repository::add_vault;
+use crate::server::server::Server;
+use crate::server::server::ServerSettings;
 use crate::utils::logger::LoggerSettings;
+
+use std::sync::Arc;
+
 use clap::{command, Parser, Subcommand};
 use dotenvy::dotenv;
-use entities::meteora_pool;
 use serde::Deserialize;
 use tracing::info;
 
@@ -26,8 +28,8 @@ pub struct AppSettings {
     pub app_name: String,
     pub debug: bool,
     pub logger: LoggerSettings,
-    // Add these fields
     pub db: DBSettings,
+    pub server_settings: ServerSettings,
 }
 
 const PATH: &str = ".";
@@ -46,6 +48,8 @@ enum Commands {
     Sync,
     /// List all financial products sorted by APR
     List,
+    /// Start the API server
+    Server,
 }
 
 async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
@@ -53,10 +57,9 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
     let configuration = utils::settings::get_configuration::<AppSettings>(PATH)?;
     let _guard = utils::logger::init_logger(None, &configuration.app_name, &configuration.logger);
 
-    let db_pool = database::Database::init(&configuration.db)
-        .await?
-        .get_pool()
-        .clone();
+    let database = database::Database::init(&configuration.db).await?;
+
+    let db_pool = database.get_pool().clone();
 
     match args.command {
         Commands::Sync => {
@@ -91,6 +94,14 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
+        }
+        Commands::Server {} => {
+            let state_params = server::server::StateParams {
+                database: Arc::new(database),
+            };
+
+            let app = Server::build(configuration.server_settings.clone(), &state_params).await;
+            app.run().await;
         }
     }
 

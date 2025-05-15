@@ -1,7 +1,7 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-#[derive(Debug, Deserialize, FromRow)]
+#[derive(Debug, Deserialize, FromRow, Serialize, Clone, PartialEq)]
 pub struct MeteoraPool {
     pub pool_address: String,
     pub pool_name: String,

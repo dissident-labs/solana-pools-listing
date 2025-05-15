@@ -1,8 +1,8 @@
 use crate::entities::vault::Vault;
 use reqwest::Client;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct OrderlyVault {
     vault_address: String,
     vault_id: String,
@@ -23,20 +23,20 @@ struct OrderlyVault {
     min_withdrawal_amount: f64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct ChainInfo {
     chain_id: String,
     chain_name: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct OrderlyResponse {
     success: bool,
     timestamp: u64,
     data: OrderlyData,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct OrderlyData {
     rows: Vec<OrderlyVault>,
 }
